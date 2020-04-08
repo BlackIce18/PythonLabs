@@ -1,0 +1,55 @@
+#SELECT Book.Название,  `Book`.`Год издания`
+    #FROM Book (WHERE Book.Стоимость > )
+#SELECT Book.Название, `Book`.`Год издания`, Book.Стоимость
+#FROM Book
+#WHERE
+#    Book.Стоимость >(
+SELECT Instance.id_book, `Instance`.`Код УДК`,Book.Название
+FROM Book
+JOIN Instance ON Instance.id_book = Book.id WHERE 
+    SELECT `Instance`.`Код УДК`, AVG(Book.Стоимость) as avgBook
+    FROM Book
+    JOIN Instance ON Instance.id_book = Book.id
+    GROUP BY Instance.`Код УДК`
+#)
+
+
+
+
+
+CREATE TEMPORARY TABLE tmp (
+         `Код УДК` INT(11) UNSIGNED ZEROFILL NOT NULL,
+         `Средняя стоимость`   decimal(10,2) NOT NULL
+);
+INSERT INTO tmp     SELECT `Instance`.`Код УДК`, AVG(Book.Стоимость) as avgBook
+    FROM Book
+    JOIN Instance ON Instance.id_book = Book.id
+    GROUP BY Instance.`Код УДК`;
+
+SELECT Book.Название, Book.`Год издания`, Author.ФИО
+From Book
+JOIN Instance ON Instance.id_book = Book.id
+WHERE `Instance`.`Код УДК` = tmp.`Код УДК` AND Book.Стоимость>tmp.`Средняя стоимость`
+
+
+
+
+
+
+
+CREATE TEMPORARY TABLE tmp (
+         `Код УДК` INT(11) UNSIGNED ZEROFILL NOT NULL,
+         `Средняя стоимость`   decimal(10,2) NOT NULL
+);
+
+INSERT INTO tmp SELECT `Instance`.`Код УДК`, AVG(Book.Стоимость) as avgBook
+    FROM Book
+    JOIN Instance ON Instance.id_book = Book.id
+    GROUP BY Instance.`Код УДК`;
+
+SELECT Book.Название, Book.`Год издания`
+From Book
+JOIN Instance ON Instance.id_book = Book.id
+WHERE `Instance`.`Код УДК` = tmp.`Код УДК` AND Book.Стоимость>tmp.`Средняя стоимость`;
+
+DROP TABLE tmp;
